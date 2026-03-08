@@ -32,6 +32,28 @@ let
     '')
     else "";
 
+  collapseConsecutiveBlankLines =
+    text:
+    let
+      folded = lib.foldl' (
+        acc: line:
+        let
+          isBlank = builtins.match "^[ \t\r]*$" line != null;
+        in
+        if isBlank && acc.previousBlank
+        then acc
+        else {
+          previousBlank = isBlank;
+          revLines = [ line ] ++ acc.revLines;
+        }
+      ) {
+        previousBlank = false;
+        revLines = [];
+      } (lib.splitString "\n" text);
+    in
+    lib.concatStringsSep "\n" (lib.reverseList folded.revLines);
+  rawMergedMaterializerText = lib.concatStringsSep "\n" effectiveMergedFragments;
+  mergedMaterializerText = collapseConsecutiveBlankLines rawMergedMaterializerText;
   materializedText =
     if cfg.materializeTemplate == "codexConfigToml"
     then lib.concatStringsSep "\n" [
@@ -41,7 +63,6 @@ let
       ""
     ]
     else mergedMaterializerText;
-  mergedMaterializerText = lib.concatStringsSep "\n" effectiveMergedFragments;
 in
 {
   options.materializer = {
