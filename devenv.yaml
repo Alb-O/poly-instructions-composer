@@ -1,8 +1,26 @@
 inputs:
   nixpkgs:
     url: github:cachix/devenv-nixpkgs/rolling
+  treefmt-nix:
+    url: github:numtide/treefmt-nix
+    inputs:
+      nixpkgs:
+        follows: nixpkgs
+  git-hooks:
+    url: github:cachix/git-hooks.nix
+    inputs:
+      nixpkgs:
+        follows: nixpkgs
   committer:
-    url: git+https://github.com/Alb-O/committer.git?ref=main
+    url: github:Alb-O/committer
+    flake: false
+  env-docs:
+    url: github:Alb-O/env-docs
+    flake: false
+  env-local-overrides:
+    url: github:Alb-O/env-local-overrides
     flake: false
 imports:
   - committer
+  - env-docs
+  - env-local-overrides

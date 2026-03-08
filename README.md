@@ -1,6 +1,6 @@
 # Materializer
 
-`devenv` module for spawning files and merging fragments across repos.
+`devenv` module for materializing files and combining instruction text across repos.
 
 ## Options (`materializer.*` namespace)
 
@@ -14,6 +14,16 @@
 - `localInputOverrides.sourcePath` (default `devenv.yaml`)
 - `localInputOverrides.outputPath` (default `devenv.local.yaml`)
 - `localInputOverrides.urlScheme` (`path` or `git+file`, default `path`)
+
+`localInputOverrides.*` comes from `env-local-overrides`.
+
+## Shared Instructions (`instructions.*` namespace)
+
+- `instructions.fragments` (list of strings, default `[]`)
+
+`materializer` prepends `instructions.fragments` into
+`materializer.mergedFragments` with `mkBefore`, so producer modules can add
+shared instruction text without writing to `materializer.*` directly.
 
 ## Output
 
