@@ -3,10 +3,10 @@
 target/
 result
 
-# Lockfiles ignored for fast local-first polyrepo workflow without diff churn
-# Manually `git add -f *.lock` when actually publishing
+# `devenv.lock` is ignored for fast local-first polyrepo workflow without diff churn.
 devenv.lock
-Cargo.lock
 
 *.local.*
 *.override.*
+!*.local.example.*
+!*.override.example.*
