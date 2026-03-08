@@ -6,7 +6,7 @@ let
   localInputOverridesSourcePath =
     if lib.hasPrefix "/" cfg.localInputOverrides.sourcePath
     then cfg.localInputOverrides.sourcePath
-    else "${config.env.DEVENV_ROOT}/${cfg.localInputOverrides.sourcePath}";
+    else "${config.devenv.root}/${cfg.localInputOverrides.sourcePath}";
   localInputOverridesText =
     if builtins.pathExists localInputOverridesSourcePath
     then builtins.readFile (pkgs.runCommand "materialized-local-input-overrides.yaml" {
@@ -88,13 +88,16 @@ for input_name, input_spec in inputs_block.items():
     overrides[str(input_name)] = copied_spec
 
 output_data = {"inputs": {}}
+if not overrides:
+    raise SystemExit(0)
+
 for input_name in sorted(overrides):
     output_data["inputs"][input_name] = overrides[input_name]
 
 yaml.safe_dump(output_data, sys.stdout, sort_keys=True, default_flow_style=False)
 PY
     '')
-    else "inputs: {}\n";
+    else "";
 
   materializedText =
     if cfg.materializeTemplate == "codexConfigToml"
@@ -106,10 +109,6 @@ PY
     ]
     else mergedMaterializerText;
   mergedMaterializerText = lib.concatStringsSep "\n" cfg.mergedFragments;
-  materializedFiles = {
-    "${cfg.materializePath}".text = materializedText;
-    "${cfg.localInputOverrides.outputPath}".text = localInputOverridesText;
-  };
 in
 {
   options.materializer = {
@@ -170,10 +169,14 @@ in
     };
   };
 
-  config = {
-    files = materializedFiles;
-
-    outputs.materialized_text = pkgs.writeText "materialized-text.md" mergedMaterializerText;
-    outputs.materialized_local_input_overrides = pkgs.writeText "devenv-local-input-overrides.yaml" localInputOverridesText;
-  };
+  config = lib.mkMerge [
+    {
+      files."${cfg.materializePath}".text = materializedText;
+      outputs.materialized_text = pkgs.writeText "materialized-text.md" mergedMaterializerText;
+    }
+    (lib.mkIf (localInputOverridesText != "") {
+      files."${cfg.localInputOverrides.outputPath}".text = localInputOverridesText;
+      outputs.materialized_local_input_overrides = pkgs.writeText "devenv-local-input-overrides.yaml" localInputOverridesText;
+    })
+  ];
 }
