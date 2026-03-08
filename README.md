@@ -16,7 +16,7 @@
 
 ## Output
 
-- `outputs.materialized_text`
+- `outputs.materialized_text` (only when `materializer.mergedFragments` is non-empty)
 - `outputs.materialized_local_input_overrides` (only when at least one input URL matches `materializer.localInputOverrides.matchPattern`)
 
 Example generated override:
@@ -33,6 +33,7 @@ inputs:
 ## Notes
 
 - The `codexConfigToml` value for the `materializeTemplate` option uses codex's `developer_instructions` config key, materializing `.codex/config.toml` instead of `AGENTS.override.md`.
+- The main materialized instruction file is only created when `materializer.mergedFragments` is non-empty.
 - `devenv.local.yaml` is materialized through `files` on shell entry as a symlink to the Nix store (same mechanism as `AGENTS.override.md`) only when at least one input matches.
 - For machine-local path overrides, set `materializer.localInputOverrides.reposRoot` in `devenv.local.nix` (untracked).
 - Use `materializer.localInputOverrides.urlScheme = "git+file"` if you explicitly want git-backed local input URLs.

@@ -1,3 +1,8 @@
 inputs:
   nixpkgs:
     url: github:cachix/devenv-nixpkgs/rolling
+  committer:
+    url: git+https://github.com/Alb-O/committer.git?ref=main
+    flake: false
+imports:
+  - committer

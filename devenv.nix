@@ -97,10 +97,10 @@ in
   };
 
   config = lib.mkMerge [
-    {
+    (lib.mkIf (mergedMaterializerText != "") {
       files."${cfg.materializePath}".text = materializedText;
       outputs.materialized_text = pkgs.writeText "materialized-text.md" mergedMaterializerText;
-    }
+    })
     (lib.mkIf (localInputOverridesText != "") {
       files."${cfg.localInputOverrides.outputPath}".text = localInputOverridesText;
       outputs.materialized_local_input_overrides = pkgs.writeText "devenv-local-input-overrides.yaml" localInputOverridesText;
